@@ -2,10 +2,10 @@
     <Dialog v-bind:open="isOpen">
         <DialogContent class="max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-                <DialogTitle class="flex gap-2 items-center justify-between mr-5">Add Task
+                <DialogTitle class="flex gap-2 items-center">Add Task
                     <Popover v-model:open="open">
             <PopoverTrigger as-child>
-                <Button variant="ghost" role="combobox" :aria-expanded="open" class="w-8 h-8 mr-2"><Avatar><Icon name="lucide:user" size="24"/></Avatar></Button>
+                <Button variant="outline" role="combobox" :aria-expanded="open" class="w-[200px]">Select User</Button>
             </PopoverTrigger>
             <PopoverContent class="w-[200px] p-0">
                 <Command>
@@ -13,7 +13,7 @@
                     <CommandEmpty>No users found.</CommandEmpty>
                     <CommandList>
                         <CommandGroup>
-                            <CommandItem>John Doe</CommandItem>
+                            <CommandItem v-for="user in users" :key="user.id" :value="user.name">{{ user.name }}</CommandItem>
                         </CommandGroup>
                     </CommandList>
                 </Command>
@@ -44,7 +44,13 @@ export default {
     data() {
         return {
             title: '',
-            description: ''
+            description: '',
+            users: [
+                { id: 1, name: 'John Doe' },
+                { id: 2, name: 'Jane Doe' },
+                { id: 3, name: 'Jim Doe' }
+            ],
+            open: false
         }
     }
 }
