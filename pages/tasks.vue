@@ -1,6 +1,24 @@
 <template>
     <header class="flex justify-between items-center">
-        <h1>Tasks</h1>
+        <div class="flex gap-2 items-center">
+            <h1>Tasks</h1>
+            <Popover v-model:open="open">
+            <PopoverTrigger as-child>
+                <Button variant="outline" role="combobox" :aria-expanded="open" class="w-[200px]">Select User</Button>
+            </PopoverTrigger>
+            <PopoverContent class="w-[200px] p-0">
+                <Command>
+                    <CommandInput class="h-9" placeholder="Search user..." />
+                    <CommandEmpty>No users found.</CommandEmpty>
+                    <CommandList>
+                        <CommandGroup>
+                            <CommandItem v-for="user in users" :key="user.id" :value="user.name">{{ user.name }}</CommandItem>
+                        </CommandGroup>
+                    </CommandList>
+                </Command>
+            </PopoverContent>
+        </Popover>
+        </div>
         <div class="flex gap-2 items-center">
             <Icon name="lucide:search" size="24" />
             <Input type="text" placeholder="Search" />
@@ -22,7 +40,21 @@ export default {
         return {
             tasks: [],
             isDialogOpen: false,
-            open: false
+            open: false,
+            users: [
+                {
+                    id: 1,
+                    name: 'John Doe'
+                },
+                {
+                    id: 2,
+                    name: 'Jane Doe'
+                },
+                {
+                    id: 3,
+                    name: 'Jim Doe'
+                }
+            ]
         }
     },
     methods: {
