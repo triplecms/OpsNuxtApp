@@ -1,16 +1,25 @@
 <template>
   <Sidebar defaultOpen="true">
     <SidebarHeader>
-      <img src="../public/triplec-logo.svg" alt="Logo" class="h-[60px]" />
+      <img src="/triplec-logo.svg" alt="Logo" class="h-[60px]" />
     </SidebarHeader>
     <SidebarContent>
-      <SidebarMenuButton asChild>
-        <a href="/tasks">
-          <Icon name="lucide:calendar-check-2" size="24" />
-          <span>Tasks</span>
-        </a>
-      </SidebarMenuButton>
-      <SidebarMenuButton asChild>
+      <SidebarMenu>
+        <SidebarGroup>
+        <SidebarGroupLabel>Admin</SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            <SidebarMenuButton asChild>
+              <a href="/tasks">
+                <Icon name="lucide:calendar-check-2" size="24" />
+                <span>Tasks</span>
+              </a>
+            </SidebarMenuButton>
+          </SidebarMenu>
+          </SidebarGroupContent> 
+        </SidebarGroup>
+      </SidebarMenu>
+      <!--<SidebarMenuButton asChild>
         <a href="/tenders">
           <Icon name="lucide:hard-hat" size="24" />
           <span>Tenders</span>
@@ -45,8 +54,8 @@
         <SidebarGroupContent>
           <SidebarMenu>
           </SidebarMenu>
-        </SidebarGroupContent>
-      </SidebarGroup>
+        </SidebarGroupContent> 
+      </SidebarGroup> -->
     </SidebarContent>
     <SidebarFooter>
       <SidebarMenu>
@@ -61,8 +70,8 @@
             <DropdownMenuContent class="w-[--radix-popper-anchor-width]">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Profile</DropdownMenuItem>
-              <DropdownMenuItem>Team</DropdownMenuItem>
+              <DropdownMenuItem @click="navigateTo('/settings/profile')">Profile</DropdownMenuItem>
+              <DropdownMenuItem @click="navigateTo('/settings/team')">Team</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem @click="logout">Log out</DropdownMenuItem>
             </DropdownMenuContent>
@@ -80,11 +89,12 @@ export default {
     }
   },
   methods: {
-    logout
-  }
-}
+    async logout() {
+      const tokenCookie = useCookie('token')
+      tokenCookie.value = null
 
-function logout() {
-  navigateTo('/')
+      navigateTo('/login')
+    }
+  }
 }
 </script>

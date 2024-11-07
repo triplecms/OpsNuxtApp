@@ -11,3 +11,5 @@
     </SidebarProvider>
   </div>
 </template>
+<script>
+</script>

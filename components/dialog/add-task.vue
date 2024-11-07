@@ -2,33 +2,25 @@
     <Dialog v-bind:open="isOpen">
         <DialogContent class="max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-                <DialogTitle class="flex gap-2 items-center">Add Task
-                    <Popover v-model:open="open">
-            <PopoverTrigger as-child>
-                <Button variant="outline" role="combobox" :aria-expanded="open" class="w-[200px]">Select User</Button>
-            </PopoverTrigger>
-            <PopoverContent class="w-[200px] p-0">
-                <Command>
-                    <CommandInput class="h-9" placeholder="Search user..." />
-                    <CommandEmpty>No users found.</CommandEmpty>
-                    <CommandList>
-                        <CommandGroup>
-                            <CommandItem v-for="user in users" :key="user.id" :value="user.name">{{ user.name }}</CommandItem>
-                        </CommandGroup>
-                    </CommandList>
-                </Command>
-            </PopoverContent>
-        </Popover>
-    </DialogTitle>
                 <DialogDescription>Add a new task to the calendar</DialogDescription>
+                <DialogTitle class="flex gap-2 items-center">
+                    <SelectDate v-bind:value="date" />
+                    <!-- Select User -->
+                    <SelectUser v-bind:selectedUsers="selectedUsers" v-bind:users="users" />
+                </DialogTitle>
             </DialogHeader>
-            <DialogDescription></DialogDescription>
+            <DialogDescription>
+                <div class="flex gap-2 items-center flex-wrap">
+                    <div v-for="(user, index) in selectedUsers" :key="index" class="inline-block bg-gray-200 text-gray-700 rounded-full px-3 py-1 text-sm font-semibold flex items-center">
+                        {{ user.user_first_name }} {{ user.user_last_name }}
+                        <button @click="() => { selectedUsers.splice(index, 1); users.push(user) }" class="ml-2 text-sm text-gray-700 hover:text-red-500"><Icon name="lucide:x" class="w-4 h-4 flex items-center justify-center" /></button>
+                    </div>
+                </div>
+            </DialogDescription>
             <Input v-model="title" placeholder="Title" />
             <Textarea v-model="description" placeholder="Description" class="min-h-[100px]" />
             <DialogFooter>
-                <DialogClose asChild>
-                    <Button>Save</Button>
-                </DialogClose>
+                <Button @click="save">Save</Button>
             </DialogFooter>
         </DialogContent>
     </Dialog>
@@ -45,13 +37,41 @@ export default {
         return {
             title: '',
             description: '',
-            users: [
-                { id: 1, name: 'John Doe' },
-                { id: 2, name: 'Jane Doe' },
-                { id: 3, name: 'Jim Doe' }
-            ],
+            selectedUsers: [],
+            date: {
+                start: null,
+                end: null
+            },
+            users: [],
             open: false
         }
+    },
+    methods: {
+        save,
+        getUsers
+    },
+    mounted(){
+        this.getUsers()
     }
+}
+
+async function save() {
+    console.log(this.title, this.description, this.selectedUsers, this.date)
+    const api = useApi();
+    const response = await api.post('/task/create', {
+        task_name: this.title,
+        task_description: this.description,
+        task_start_date: new Date(this.date.start).toISOString().split('T')[0],
+        task_end_date: new Date(this.date.end).toISOString().split('T')[0],
+        task_assigned_to: this.selectedUsers.map(user => user.user_id)
+    })
+    console.log(response)
+}
+
+async function getUsers() {
+    const api = useApi();
+    const response = await api.get('/user/get-all')
+    console.log(response)
+    this.users = response.users
 }
 </script>
