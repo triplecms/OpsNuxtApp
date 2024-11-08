@@ -6,14 +6,14 @@
                 <DialogTitle class="flex gap-2 items-center">
                     <SelectDate v-bind:value="task.date" />
                     <!-- Select User -->
-                    <SelectUser v-bind:selectedUsers="selectedUsers" v-bind:users="users" />
+                    <SelectUser v-bind:selectedUsers="task.task_assigned_to" v-bind:users="task.users" />
                 </DialogTitle>
             </DialogHeader>
             <DialogDescription>
                 <div class="flex gap-2 items-center flex-wrap">
-                    <div v-for="(user, index) in selectedUsers" :key="index" class="inline-block bg-gray-200 text-gray-700 rounded-full px-3 py-1 text-sm font-semibold flex items-center">
+                    <div v-for="(user, index) in task.task_assigned_to" :key="index" class="inline-block bg-gray-200 text-gray-700 rounded-full px-3 py-1 text-sm font-semibold flex items-center">
                         {{ user.user_first_name }} {{ user.user_last_name }}
-                        <button @click="() => { selectedUsers.splice(index, 1); users.push(user) }" class="ml-2 text-sm text-gray-700 hover:text-red-500"><Icon name="lucide:x" class="w-4 h-4 flex items-center justify-center" /></button>
+                        <button @click="() => { task.task_assigned_to.splice(index, 1); task.users.push(user) }" class="ml-2 text-sm text-gray-700 hover:text-red-500"><Icon name="lucide:x" class="w-4 h-4 flex items-center justify-center" /></button>
                     </div>
                 </div>
             </DialogDescription>
@@ -62,7 +62,7 @@ export default {
                     end: null
                 }
             }
-        }
+        },
     },
     data() {
         return {
@@ -71,8 +71,8 @@ export default {
                 end: null
             },
             users: [],
-            selectedUsers: [],
-            open: false
+            open: false,
+            selectedUsers: []
         }
     },
     methods: {

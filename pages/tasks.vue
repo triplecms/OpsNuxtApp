@@ -55,7 +55,8 @@ export default {
                 task_date: {
                     start: null,
                     end: null
-                }
+                },
+                users: []
             },
             tasks: [],
             search: '',
@@ -202,6 +203,7 @@ async function getUsers(params = {}) {
     console.log(response)
     this.users = response.users
     this.meta = response.meta
+    this.task.users = this.users                                                                                                                                                                                                                                                                                                                                        
 }
 
 function onSuccess() {
