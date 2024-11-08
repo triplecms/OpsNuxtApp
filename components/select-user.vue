@@ -9,7 +9,7 @@
                 <CommandEmpty>No users found.</CommandEmpty>
                 <CommandList>
                     <CommandGroup>
-                        <CommandItem v-for="user in users" :key="user.id" :value="user.user_uuid" @click="selectedUsers.push(user); users.splice(users.indexOf(user), 1)">{{ user.user_first_name }} {{ user.user_last_name }}</CommandItem>
+                        <CommandItem v-for="user in users" :key="user.id" :value="user.user_first_name" @click="selectedUsers.push(user); users.splice(users.indexOf(user), 1)">{{ user.user_first_name }} {{ user.user_last_name }}</CommandItem>
                     </CommandGroup>
                     </CommandList>
                 </Command>
@@ -32,18 +32,7 @@ export default {
         return {
             open: false
         }
-    },
-    methods: {
-        searchUsers
     }
 }
 
-async function searchUsers(event) {
-    console.log(event.target.value)
-    const searchPhrase = event.target.value.toLowerCase();
-    this.users = await this.users.filter(user => {
-        const fullName = `${user.user_first_name} ${user.user_last_name}`.toLowerCase();
-        return fullName.includes(searchPhrase);
-    });
-}
 </script>

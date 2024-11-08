@@ -70,7 +70,7 @@
             <DropdownMenuContent class="w-[--radix-popper-anchor-width]">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem @click="navigateTo('/settings/profile')">Profile</DropdownMenuItem>
+              <!--<DropdownMenuItem @click="navigateTo('/settings/profile')">Profile</DropdownMenuItem>-->
               <DropdownMenuItem @click="navigateTo('/settings/team')">Team</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem @click="logout">Log out</DropdownMenuItem>

@@ -1,20 +1,22 @@
-import { Cookie } from "lucide-vue-next";
 
 export const useApi = () => {
   const config = useRuntimeConfig();
   const baseUrl = config.public.apiUrl
 
-  const get = async <T>(endpoint: string) => {
+  const get = async <T>(endpoint: string, params = {}) => {
+    const token = useCookie('token')  // Add this line
     return await $fetch<T>(`${baseUrl}${endpoint}`, {
+      params,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('auth')}`
+        'Authorization': `Bearer ${token.value}`
       }
     })
   }
 
   const post = async <T>(endpoint: string, payload: any) => {
     try {
+      const token = useCookie('token')  // Add this line
       console.log('Request URL:', `${baseUrl}${endpoint}`)
       console.log('Request Payload:', payload)
 
@@ -23,8 +25,7 @@ export const useApi = () => {
         body: payload,
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth')}`
+          'Authorization': `Bearer ${token.value}`
         },
       })
     } catch (err) {
@@ -34,7 +35,7 @@ export const useApi = () => {
   }
 
   const _delete = async <T>(endpoint: string, options = {}) => {
-    const token = useCookie('token')
+    const token = useCookie('token')  // Add this line
     const queryString = options.params ? `?${new URLSearchParams(options.params)}` : '';
     return await $fetch<T>(`${baseUrl}${endpoint}`, {
       method: 'DELETE',
@@ -46,11 +47,12 @@ export const useApi = () => {
   }
 
   const put = async <T>(endpoint: string, payload: any) => {
+    const token = useCookie('token')  // Add this line
     return await $fetch<T>(`${baseUrl}${endpoint}`, {
       method: 'PUT',
       body: payload,
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('auth')}`
+        'Authorization': `Bearer ${token.value}`
       }
     })
   }

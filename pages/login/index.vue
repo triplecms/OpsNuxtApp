@@ -1,6 +1,6 @@
 <template>
     <div class="flex justify-center items-center h-screen">
-    <Card class="w-full max-w-md">
+    <Card class="w-full max-w-md m-2">
         <CardHeader>
             <img src="/triplec-logo.svg" alt="Logo" class="h-[90px]" />
         </CardHeader>

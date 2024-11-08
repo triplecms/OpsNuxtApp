@@ -1,11 +1,14 @@
 <template>
     <header class="flex justify-between items-center">
         <h1>Team</h1>
-        <Button @click="toggleDialog"><Icon name="lucide:plus" size="24" /> Team Member</Button>
-        <DialogAddTeamMember v-model:open="isDialogOpen" @success="onSuccess" />
+        <Button @click="addTeamMember"><Icon name="lucide:plus" size="24" /> Team Member</Button>
+        <DialogAddTeamMember v-model:open="isDialogOpen" @success="onSuccess" :user="user" />
     </header>
     <main class="mt-4">
-        <DataTable :headers="headers" :rows="rows" :rowActions="rowActions" />
+        <div class="flex gap-2 items-center my-2">
+           <!-- <SelectUser v-bind:selectedUsers="selectedUsers" v-bind:users="users" /> -->
+        </div>
+        <DataTable :headers="headers" :rows="rows" :rowActions="rowActions" :meta="meta" />
     </main>
 </template>
 <script>
@@ -14,11 +17,18 @@ definePageMeta({
     middleware: ['auth']
 })
 const toast = useToast()
-
 export default{
     data(){
         return {
             isDialogOpen: false,
+            selectedUsers: [],
+            user: {
+                user_id: null,
+                user_first_name: '',
+                user_last_name: '',
+                user_phone: ''
+            },
+            meta: null,
             headers:[
                 {
                     id : "user_first_name",
@@ -44,8 +54,9 @@ export default{
                 {
                     id: 1,
                     name: 'Edit',
-                    action: () => {
-                        console.log('Edit')
+                    action: (row) => {
+                        console.log(row)
+                        this.editTeamMember(row)
                     },
                     icon: 'lucide:pencil'
                 },
@@ -53,8 +64,6 @@ export default{
                     id: 2,
                     name: 'Delete',
                     action: (row) => {
-                        console.log('Delete')
-                        console.log(row)
                         this.deleteTeamMember(row.user_uuid)
                     },
                     icon: 'lucide:trash'
@@ -66,11 +75,30 @@ export default{
         toggleDialog,
         getTeamMembers,
         deleteTeamMember,
-        onSuccess
+        onSuccess,
+        addTeamMember,
+        editTeamMember
     },
     mounted(){
         this.getTeamMembers()
     }
+}
+
+function addTeamMember() {
+    this.user = {
+        user_id: null,
+        user_first_name: '',
+        user_last_name: '',
+        user_phone: ''
+    }
+    this.toggleDialog()
+}
+
+function editTeamMember(row) {
+    this.user = row
+    console.log(row)
+    console.log(this.user)
+    this.toggleDialog()
 }
 
 function toggleDialog() {
@@ -82,6 +110,7 @@ async function getTeamMembers() {
     const response = await api.get('/user/get-all')
     console.log(response)
     this.rows = response.users
+    this.meta = response.meta
 }
 
 async function deleteTeamMember(id) {
