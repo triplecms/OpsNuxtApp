@@ -5,25 +5,28 @@
         </PopoverTrigger>
         <PopoverContent class="w-[200px] p-0">
             <Command>
-                <CommandInput class="h-9" placeholder="Search user..." @keyup="searchUsers" />
+                <CommandInput class="h-9" placeholder="Search user..."/>
                 <CommandEmpty>No users found.</CommandEmpty>
                 <CommandList>
                     <CommandGroup>
-                        <CommandItem v-for="user in users" :key="user.id" :value="user.user_first_name" @click="selectedUsers.push(user); users.splice(users.indexOf(user), 1)">{{ user.user_first_name }} {{ user.user_last_name }}</CommandItem>
+                        <CommandItem v-for="user in filterUsers(availableUsers, selectedUsers)" :key="user.id" :value="user.user_first_name" @click="selectedUsers.push(user)">{{ user.user_first_name }} {{ user.user_last_name }}</CommandItem>
                     </CommandGroup>
-                    </CommandList>
-                </Command>
+                </CommandList>
+            </Command>
         </PopoverContent>
     </Popover>
 </template>
 <script>
+
 export default {
     props: {
-        selectedUsers: {
+
+        availableUsers: {
             type: Array,
-            required: true
+            required: false
         },
-        users: {
+
+        selectedUsers: {
             type: Array,
             required: true
         }
@@ -32,7 +35,14 @@ export default {
         return {
             open: false
         }
+    },
+    methods: {
+        filterUsers
     }
 }
 
+function filterUsers(users, selectedUsers) {
+    console.log(users, selectedUsers);
+    return users.filter(user => !selectedUsers.some(selected => selected.user_id === user.user_id));
+}
 </script>

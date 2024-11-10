@@ -2,18 +2,18 @@
     <Dialog v-bind:open="isOpen">
         <DialogContent class="max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-                <DialogDescription>Add a new task to the calendar</DialogDescription>
+                <DialogDescription v-if="!task.task_id">Add a new task to the calendar</DialogDescription>
                 <DialogTitle class="flex gap-2 items-center">
                     <SelectDate v-bind:value="task.date" />
                     <!-- Select User -->
-                    <SelectUser v-bind:selectedUsers="task.task_assigned_to" v-bind:users="task.users" />
+                    <SelectUser v-bind:selectedUsers="task.selectedUsers" :availableUsers="task.users" id="user-search-task"/>
                 </DialogTitle>
             </DialogHeader>
             <DialogDescription>
                 <div class="flex gap-2 items-center flex-wrap">
-                    <div v-for="(user, index) in task.task_assigned_to" :key="index" class="inline-block bg-gray-200 text-gray-700 rounded-full px-3 py-1 text-sm font-semibold flex items-center">
+                    <div v-for="(user, index) in task.selectedUsers" :key="index" class="inline-block bg-gray-200 text-gray-700 rounded-full px-3 py-1 text-sm font-semibold flex items-center">
                         {{ user.user_first_name }} {{ user.user_last_name }}
-                        <button @click="() => { task.task_assigned_to.splice(index, 1); task.users.push(user) }" class="ml-2 text-sm text-gray-700 hover:text-red-500"><Icon name="lucide:x" class="w-4 h-4 flex items-center justify-center" /></button>
+                        <button @click="() => { task.selectedUsers.splice(index, 1);}" class="ml-2 text-sm text-gray-700 hover:text-red-500"><Icon name="lucide:x" class="w-4 h-4 flex items-center justify-center" /></button>
                     </div>
                 </div>
             </DialogDescription>
@@ -32,6 +32,9 @@
                         Task is complete
                     </label>
                 </div>
+            </div>
+            <div>
+                {{ task.use }}
             </div>
             <DialogFooter>
                 <Button @click="save" v-if="!task.task_id">Save</Button>
@@ -72,7 +75,6 @@ export default {
             },
             users: [],
             open: false,
-            selectedUsers: []
         }
     },
     methods: {
@@ -81,7 +83,7 @@ export default {
         getUsers
     },
     mounted(){
-        this.getUsers()
+        //this.getUsers()
     }
 }
 
@@ -89,13 +91,13 @@ async function save() {
    try{
         const api = useApi();
         const response = await api.post('/task/create', {
-            task_name: this.title,
-            task_description: this.description,
-            task_start_date: new Date(this.date.start).toISOString().split('T')[0],
-            task_end_date: new Date(this.date.end).toISOString().split('T')[0],
-            task_assigned_to: this.selectedUsers.map(user => user.user_id),
-            task_is_complete: this.isComplete,
-            task_is_discussed: this.isDiscussed
+            task_name: this.task.task_name,
+            task_description: this.task.task_description,
+            task_start_date: this.task.date.start ? new Date(this.task.date.start).toISOString().split('T')[0] : null,
+            task_end_date: this.task.date.end ? new Date(this.task.date.end).toISOString().split('T')[0] : null,
+            task_assigned_to: this.task.selectedUsers.map(user => user.user_id),
+            task_is_complete: this.task.task_is_complete,
+            task_is_discussed: this.task.task_is_discussed
         })
         console.log(response)
         this.$emit('success');
@@ -113,9 +115,9 @@ async function update() {
         const response = await api.put(`/task/update/${this.task.task_uuid}`, {
             task_name: this.task.task_name,
             task_description: this.task.task_description,
-            task_start_date: this.task.task_start_date,
-            task_end_date: this.task.task_end_date,
-            task_assigned_to: this.selectedUsers.map(user => user.user_id),
+            task_start_date: this.task.date.start ? new Date(this.task.date.start).toISOString().split('T')[0] : null,
+            task_end_date: this.task.date.end ? new Date(this.task.date.end).toISOString().split('T')[0] : null,
+            task_assigned_to: this.task.selectedUsers.map(user => user.user_id),
             task_is_complete: this.task.task_is_complete,
             task_is_discussed: this.task.task_is_discussed,
         })
@@ -129,6 +131,7 @@ async function update() {
 }
 
 async function getUsers() {
+    console.log('getUsers in task dialog')
     const api = useApi();
     const response = await api.get('/user/get-all')
     console.log(response)

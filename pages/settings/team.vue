@@ -8,7 +8,7 @@
         <div class="flex gap-2 items-center my-2">
            <!-- <SelectUser v-bind:selectedUsers="selectedUsers" v-bind:users="users" /> -->
         </div>
-        <DataTable :headers="headers" :rows="rows" :rowActions="rowActions" :meta="meta" />
+        <DataTable :headers="headers" :rows="rows" :rowActions="rowActions" :meta="meta" :hoverColumn="false"/>
     </main>
 </template>
 <script>

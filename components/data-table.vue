@@ -14,19 +14,22 @@
                     <TableHead v-if="rowActions">
                         <span></span>
                     </TableHead>
+                    <TableHead v-if="hoverColumn">
+                        <span></span>
+                    </TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
-                <TableRow v-for="row in rows" :key="row.id">
+                <TableRow v-for="row in rows" :key="row.id" @click="$emit('rowClick', row)" @mouseover="hoverRow = row" @mouseleave="hoverRow = null" class="cursor-pointer h-[50px]">
                     <TableCell v-for="header in headers" :key="header.id">
-                        <FlexRow v-if="header.render">
+                        <FlexRow v-if="header.type === 'badge' && header.render(row) != ''">
+                                <Badge :class="getBadgeClass(header.render(row))">{{ header.render(row) }}</Badge>
+                        </FlexRow>
+                        <FlexRow v-else-if="header.render">
                             {{ header.render(row) }}
                         </FlexRow>
                         <FlexRow v-else-if="!header.type">
                             {{ row[header.id] }}
-                        </FlexRow>
-                        <FlexRow v-else-if="header.type === 'checkbox'" class="flex items-center justify-center">
-                            <Icon name="lucide:check" v-if="row[header.id]"/>
                         </FlexRow>
                         <FlexRow v-else>
                             <div v-if="header.type === 'avatar_list'" class="flex items-center space-x-1 overflow-x-auto w-full">
@@ -56,6 +59,12 @@
                                     <DropdownMenuItem v-for="action in rowActions" :key="action.id" @click="action.action(row)"> <Icon :name="action.icon" class="w-4 h-4" /> {{ action.name }}</DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
+                        </FlexRow>
+                    </TableCell>
+                    <TableCell v-if="hoverColumn">
+                        <FlexRow class="flex justify-end">
+                            <Icon name="lucide:chevron-right" class="w-4 h-4" v-if="hoverRow === row" />
+                            <Icon name="" class="w-4 h-4 text-muted-foreground" v-else />
                         </FlexRow>
                     </TableCell>
                 </TableRow>
@@ -123,8 +132,29 @@ export default {
         meta: {
             type: Object,
             required: false
+        },
+        hoverColumn: {
+            type: Boolean,
+            required: false,
+            default: true
         }
     },
-    emits: ['pageChange']
+    emits: ['pageChange', 'rowClick'],
+    data() {
+        return {
+            hoverRow: null
+        }
+    },methods:{
+        getBadgeClass
+    }
+
+}
+function getBadgeClass(status) {
+    switch(status) {
+        case 'complete': return 'bg-green-500 text-white'
+        case 'overdue': return 'bg-red-500 text-white'
+        case 'communicated': return 'bg-blue-500 text-white'
+        default: return 'bg-gray-500 text-white'
+    }
 }
 </script>

@@ -1,31 +1,56 @@
 <template>
     <header class="flex justify-between items-center">
         <div class="flex gap-2 items-center">
-            <h1>Tasks</h1>
         </div>
         <div class="flex gap-2 items-center">
             <!--<Button><Icon name="lucide:list" /></Button>
             <Button><Icon name="lucide:calendar-days" /></Button>-->
-            <Button @click="addTask"><Icon name="lucide:plus" size="24" /> Task</Button>
+            <AppSheet v-model:open="isSheetOpen" @update="toggleSheet">
+                <SheetHeader>
+                    <SheetTitle class="flex flex-col items-center gap-2">
+                        <div class="flex items-center gap-2">
+                        <Button variant="destructive" @click="deleteTask(selectedTask)">
+                            <Icon name="lucide:trash" class="w-4 h-4 flex items-center justify-center" />
+                        </Button>
+                        <Button variant="outline" @click="editTask(selectedTask)">
+                            <Icon name="lucide:pencil" class="w-4 h-4 flex items-center justify-center" />
+                            </Button>
+                        </div>
+                        <div class="flex flex-col items-start w-full gap-2">
+                            <span class="text-sm text-gray-500">{{ selectedTask.task_id }}</span>
+                            <h2 class="text-sm">{{ selectedTask.task_name }}</h2>
+                        </div>
+                    </SheetTitle>
+                    <SheetDescription>
+                        {{ selectedTask.task_description }}
+                    </SheetDescription>
+                    </SheetHeader>
+                    <div class="grid gap-4 py-4">
+                    </div>
+                    <SheetFooter>
+                    </SheetFooter>
+            </AppSheet>
             <DialogAddTask v-model:open="isDialogOpen" @success="onSuccess" :task="task"/>
         </div>
     </header>
     <div class="flex gap-2 items-center my-2">
+        <Button variant="outline" @click="addTask"><Icon name="lucide:plus" size="24" /> Task</Button>
+        <Button variant="outline" @click="clearFilter"><Icon name="lucide:filter-x" size="24" /></Button>
         <SelectDate v-bind:value="date" />
-        <SelectUser v-bind:selectedUsers="selectedUsers" v-bind:users="users" />
+        <SelectUser :availableUsers="users" v-bind:selectedUsers="searchSelectedUsers" id="user-search" />
         <div class="flex items-center gap-0.5">
             <Input v-model="search" placeholder="Search" />
             <Button variant="outline" class="flex items-center gap-1" @click="onPageChange(1)"><Icon name="lucide:search"/>Search</Button>
         </div>
     </div>
     <div class="flex gap-2 items-center my-2">
-        <div v-for="(user, index) in selectedUsers" :key="index" class="inline-block bg-gray-200 text-gray-700 rounded-full px-3 py-1 text-sm font-semibold flex items-center">
+        <div v-for="(user, index) in searchSelectedUsers" :key="index" class="inline-block bg-gray-200 text-gray-700 rounded-full px-3 py-1 text-sm font-semibold flex items-center">
             {{ user.user_first_name }} {{ user.user_last_name }}
-            <button @click="() => { selectedUsers.splice(index, 1); users.push(user) }" class="ml-2 text-sm text-gray-700 hover:text-red-500"><Icon name="lucide:x" class="w-4 h-4 flex items-center justify-center" /></button>
+            <button @click="() => { searchSelectedUsers.splice(index, 1)}" class="ml-2 text-sm text-gray-700 hover:text-red-500"><Icon name="lucide:x" class="w-4 h-4 flex items-center justify-center" /></button>
         </div>
     </div>
     <main class="flex flex-col gap-4">
-        <DataTable :headers="headers" :rows="rows" :rowActions="rowActions" :meta="meta" @pageChange="onPageChange" />
+        <DataTable :headers="headers" :rows="rows" :meta="meta" @pageChange="onPageChange" @rowClick="rowClick"/>
     </main>
 </template>
 <script>
@@ -39,15 +64,19 @@ export default {
     name: 'TasksPage',
     data() {
         return {
+            searchUsers: [],
+            searchSelectedUsers: [],
             date: {
                 start: null,
                 end: null
             },
+            isSheetOpen: false,
             task: {
                 task_id: null,
                 task_name: '',
                 task_description: '',
-                task_assigned_to: [],
+                users: [],
+                selectedUsers: [],
                 task_is_complete: false,
                 task_is_discussed: false,
                 task_start_date: null,
@@ -56,16 +85,17 @@ export default {
                     start: null,
                     end: null
                 },
-                users: []
             },
             tasks: [],
             search: '',
             isDialogOpen: false,
             open: false,
-            selectedUsers: [],
-            users: [],
             meta: null,
             headers: [
+                {
+                    id: 'task_id',
+                    name: 'ID'
+                },
                 {
                     id: 'task_name',
                     name: 'Task'
@@ -87,42 +117,26 @@ export default {
                     type: 'avatar_list',
                 },
                 {
-                    id: 'task_is_discussed',
-                    name: 'Discussed',
-                    icon: 'lucide:message-circle',
-                    type: 'checkbox',
-                    iconClass: 'flex items-center justify-center w-full h-4'
-                },
-                {
-                    id: 'task_is_complete',
-                    name: 'Complete',
-                    icon: 'lucide:check',
-                    type: 'checkbox',
-                    iconClass: 'flex items-center justify-center w-full h-4'
+                    id: 'task_status',
+                    name: 'Status',
+                    type: 'badge',
+                    render: (row) => {
+                        if(row.task_is_complete) {
+                            return 'complete'
+                        }
+                        const today = new Date()
+                        console.log(row.task_end_date, today)
+                        if(row.task_end_date && new Date(row.task_end_date) < today) {
+                            return 'overdue'
+                        }
+                        if(row.task_is_discussed) {
+                            return 'communicated'
+                        }
+                        return ''
+                    }
                 }
             ],
             rows: [],
-            rowActions: [
-                {
-                    id: 1,
-                    name: 'Edit',
-                    action: (row) => {
-                        console.log('Edit')
-                        this.editTask(row)
-                    },
-                    icon: 'lucide:pencil'
-                },
-                {
-                    id: 2,
-                    name: 'Delete',
-                    action: (row) => {
-                        console.log('Delete')
-                        this.deleteTask(row.task_uuid)
-                    },
-                    icon: 'lucide:trash'
-                },
-                
-            ]
         }
     },
     methods: {
@@ -133,7 +147,10 @@ export default {
         onSuccess,
         onPageChange,
         addTask,
-        editTask
+        editTask,
+        rowClick,
+        toggleSheet,
+        clearFilter
     },
     mounted(){
         this.getUsers()
@@ -141,12 +158,25 @@ export default {
     }
 }
 
+function rowClick(row) {
+    console.log('rowClick')
+    console.log(row)
+    this.selectedTask = row;
+    this.toggleSheet();
+}
+
+function toggleSheet() {
+    console.log('toggleSheet')
+    this.isSheetOpen = !this.isSheetOpen;
+}
+
 function addTask() {
     this.task = {
         task_id: null,
         task_name: '',
         task_description: '',
-        task_assigned_to: [],
+        selectedUsers: [],
+        users: this.task.users,
         task_is_complete: false,
         task_is_discussed: false,
         task_start_date: null,
@@ -157,17 +187,18 @@ function addTask() {
             end: null
         }
     }
+    console.log('addTask', this.task)
     this.toggleDialog()
 }
 
 function editTask(row) {
-    console.log(row)
     this.task = {
         task_id: row.task_id,
         task_uuid: row.task_uuid,
         task_name: row.task_name,
         task_description: row.task_description,
-        task_assigned_to: row.task_assigned_to,
+        users: this.task.users,
+        selectedUsers: row.assignedUsers,
         task_is_complete: row.task_is_complete == '1' ? true : false,
         task_is_discussed: row.task_is_discussed == '1' ? true : false,
         task_date: row.task_date,
@@ -178,6 +209,7 @@ function editTask(row) {
             end: row.task_end_date
         }
     }
+    console.log('editTask', this.task)
     this.toggleDialog()
 }
 
@@ -190,7 +222,7 @@ function onPageChange(page = 1) {
         page: page,
         start_date: this.date.start ? new Date(this.date.start).toISOString() : null,
         end_date: this.date.end ? new Date(this.date.end).toISOString() : null,
-        users: this.selectedUsers,
+        users: this.searchSelectedUsers,
         search: this.search
     }
     console.log(filter)
@@ -203,12 +235,14 @@ async function getUsers(params = {}) {
     console.log(response)
     this.users = response.users
     this.meta = response.meta
-    this.task.users = this.users                                                                                                                                                                                                                                                                                                                                        
+    this.task.users = response.users
+    this.searchUsers = response.users
 }
 
 function onSuccess() {
     this.getTasks()
     this.toggleDialog()
+    this.toggleSheet()
 }
 
 async function getTasks(filter = null) {
@@ -223,13 +257,24 @@ async function deleteTask(task) {
     try{
         console.log(task)
         const api = useApi();
-        const response = await api._delete(`/task/delete/${task}`)
+        const response = await api._delete(`/task/delete/${task.task_uuid}`)
         console.log(response)
         toast.success('Task deleted successfully')
+        this.toggleSheet();
         this.getTasks()
     } catch (error) {
         toast.error('Error deleting task')
     }
+}
+
+function clearFilter() {
+    this.date = {
+        start: null,
+        end: null
+    }
+    this.search = ''
+    this.searchSelectedUsers = []
+    this.getTasks()
 }
 </script>
 <style>
