@@ -12,12 +12,15 @@
                             <Button variant="outline" @click="taskFeedback(selectedTask)">
                                 <Icon name="lucide:messages-square" class="w-4 h-4 flex items-center justify-center" />
                             </Button>
+                            <Button variant="outline" @click="taskAttachment(selectedTask)">
+                                <Icon name="lucide:paperclip" class="w-4 h-4 flex items-center justify-center" />
+                            </Button>
                             <Button variant="outline" @click="editTask(selectedTask)">
                                 <Icon name="lucide:pencil" class="w-4 h-4 flex items-center justify-center" />
                             </Button>   
                             <Button variant="destructive" @click="deleteTask(selectedTask)">
                                 <Icon name="lucide:trash" class="w-4 h-4 flex items-center justify-center" />
-                        </Button>
+                            </Button>
                         </div>
                         <div class="flex flex-col items-start w-full gap-2">
                             <span class="text-sm text-gray-500 ml-1">TRIP{{ selectedTask.task_id }}</span>
@@ -174,7 +177,8 @@ export default {
         rowClick,
         toggleSheet,
         clearFilter,
-        taskFeedback
+        taskFeedback,
+        taskAttachment
     },
     mounted(){
         this.getUsers()
@@ -239,6 +243,10 @@ function editTask(row) {
 
 function taskFeedback(row) {
     console.log('taskFeedback', row)
+}
+
+function taskAttachment(row) {
+    console.log('taskAttachment', row)
 }
 
 function toggleDialog() {
