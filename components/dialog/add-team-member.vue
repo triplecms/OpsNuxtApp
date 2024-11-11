@@ -55,6 +55,7 @@ async function save() {
     } catch (error) {
         console.log('Error');
         console.log(error);
+        toast.error('Error creating team member')
     }
 
 }
@@ -73,6 +74,7 @@ async function update() {
     } catch (error) {
         console.log('Error');
         console.log(error);
+        toast.error('Error updating team member')
     }
 }
 </script>

@@ -35,12 +35,12 @@
                             <div v-if="header.type === 'avatar_list'" class="flex items-center space-x-1 overflow-x-auto w-full">
                                 <TooltipProvider  v-for="user in row[header.id]" :key="user.id">
                                     <Tooltip>
-                                    <TooltipTrigger>
+                                        <TooltipTrigger>
                                         <Avatar>
                                             <AvatarImage :src="user.avatar_url" :alt="`${user.user_first_name} ${user.user_last_name}`" />
                                             <AvatarFallback>{{ user.user_first_name[0] }}{{ user.user_last_name[0] }}</AvatarFallback>
-                                        </Avatar>
-                                    </TooltipTrigger>
+                                            </Avatar>
+                                        </TooltipTrigger>
                                         <TooltipContent>
                                             {{ user.user_first_name }} {{ user.user_last_name }}
                                         </TooltipContent>
@@ -68,8 +68,13 @@
                         </FlexRow>
                     </TableCell>
                 </TableRow>
+                <TableRow v-if="rows.length === 0">
+                    <TableCell colspan="100%" class="">
+                        No data found
+                    </TableCell>
+                </TableRow>
             </TableBody>
-            <TableFooter v-if="meta">
+            <TableFooter v-if="meta && rows.length > 0">
                 <TableRow>
                     <TableCell colspan="100%">
                         <div class="flex items-center justify-between px-2">

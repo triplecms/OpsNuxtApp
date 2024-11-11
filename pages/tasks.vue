@@ -9,16 +9,34 @@
                 <SheetHeader>
                     <SheetTitle class="flex flex-col items-center gap-2">
                         <div class="flex items-center gap-2">
-                        <Button variant="destructive" @click="deleteTask(selectedTask)">
-                            <Icon name="lucide:trash" class="w-4 h-4 flex items-center justify-center" />
-                        </Button>
-                        <Button variant="outline" @click="editTask(selectedTask)">
-                            <Icon name="lucide:pencil" class="w-4 h-4 flex items-center justify-center" />
+                            <Button variant="outline" @click="taskFeedback(selectedTask)">
+                                <Icon name="lucide:messages-square" class="w-4 h-4 flex items-center justify-center" />
                             </Button>
+                            <Button variant="outline" @click="editTask(selectedTask)">
+                                <Icon name="lucide:pencil" class="w-4 h-4 flex items-center justify-center" />
+                            </Button>   
+                            <Button variant="destructive" @click="deleteTask(selectedTask)">
+                                <Icon name="lucide:trash" class="w-4 h-4 flex items-center justify-center" />
+                        </Button>
                         </div>
                         <div class="flex flex-col items-start w-full gap-2">
-                            <span class="text-sm text-gray-500">{{ selectedTask.task_id }}</span>
-                            <h2 class="text-sm">{{ selectedTask.task_name }}</h2>
+                            <span class="text-sm text-gray-500 ml-1">TRIP{{ selectedTask.task_id }}</span>
+                            <h2 class="text-sm"> 
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <Avatar>
+                                            <AvatarImage :src="selectedTask.task_created_by_user.avatar_url" :alt="`${selectedTask.task_created_by_user.user_first_name} ${selectedTask.task_created_by_user.user_last_name}`" />
+                                            <AvatarFallback>{{ selectedTask.task_created_by_user.user_first_name[0]}}{{ selectedTask.task_created_by_user.user_last_name[0] }}</AvatarFallback>
+                                        </Avatar>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        {{ selectedTask.task_created_by_user.user_first_name }} {{ selectedTask.task_created_by_user.user_last_name }}
+                                    </TooltipContent>
+                                </Tooltip>
+                                </TooltipProvider>
+                                {{ selectedTask.task_name }}
+                            </h2>
                         </div>
                     </SheetTitle>
                     <SheetDescription>
@@ -33,20 +51,25 @@
             <DialogAddTask v-model:open="isDialogOpen" @success="onSuccess" :task="task"/>
         </div>
     </header>
-    <div class="flex gap-2 items-center my-2">
-        <Button variant="outline" @click="addTask"><Icon name="lucide:plus" size="24" /> Task</Button>
-        <Button variant="outline" @click="clearFilter"><Icon name="lucide:filter-x" size="24" /></Button>
-        <SelectDate v-bind:value="date" />
-        <SelectUser :availableUsers="users" v-bind:selectedUsers="searchSelectedUsers" id="user-search" />
-        <div class="flex items-center gap-0.5">
-            <Input v-model="search" placeholder="Search" />
-            <Button variant="outline" class="flex items-center gap-1" @click="onPageChange(1)"><Icon name="lucide:search"/>Search</Button>
+    <div>
+        
+        <div class="flex gap-2 items-center my-2 justify-between">
+        <Button variant="" @click="addTask"><Icon name="lucide:plus" size="24" /> Task</Button>
+        <div class="flex gap-2 items-center">
+            <div class="flex items-center gap-0.5">
+                <Input v-model="search" placeholder="Search" />
+                <Button variant="outline" class="flex items-center gap-1" @click="onPageChange(1)"><Icon name="lucide:search"/>Search</Button>
+            </div>
+            <SelectDate v-bind:value="date" />
+            <SelectUser :availableUsers="users" v-bind:selectedUsers="searchSelectedUsers" id="user-search" />
+            <Button variant="outline" @click="clearFilter"><Icon name="lucide:filter-x" size="24" /></Button>
         </div>
-    </div>
-    <div class="flex gap-2 items-center my-2">
-        <div v-for="(user, index) in searchSelectedUsers" :key="index" class="inline-block bg-gray-200 text-gray-700 rounded-full px-3 py-1 text-sm font-semibold flex items-center">
-            {{ user.user_first_name }} {{ user.user_last_name }}
-            <button @click="() => { searchSelectedUsers.splice(index, 1)}" class="ml-2 text-sm text-gray-700 hover:text-red-500"><Icon name="lucide:x" class="w-4 h-4 flex items-center justify-center" /></button>
+        </div>
+        <div class="flex gap-2 items-center my-2">
+            <div v-for="(user, index) in searchSelectedUsers" :key="index" class="inline-block bg-gray-200 text-gray-700 rounded-full px-3 py-1 text-sm font-semibold flex items-center">
+                {{ user.user_first_name }} {{ user.user_last_name }}
+                <button @click="() => { searchSelectedUsers.splice(index, 1)}" class="ml-2 text-sm text-gray-700 hover:text-red-500"><Icon name="lucide:x" class="w-4 h-4 flex items-center justify-center" /></button>
+            </div>
         </div>
     </div>
     <main class="flex flex-col gap-4">
@@ -150,7 +173,8 @@ export default {
         editTask,
         rowClick,
         toggleSheet,
-        clearFilter
+        clearFilter,
+        taskFeedback
     },
     mounted(){
         this.getUsers()
@@ -211,6 +235,10 @@ function editTask(row) {
     }
     console.log('editTask', this.task)
     this.toggleDialog()
+}
+
+function taskFeedback(row) {
+    console.log('taskFeedback', row)
 }
 
 function toggleDialog() {

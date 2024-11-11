@@ -1,6 +1,5 @@
 <template>
     <header class="flex justify-between items-center">
-        <h1>Team</h1>
         <Button @click="addTeamMember"><Icon name="lucide:plus" size="24" /> Team Member</Button>
         <DialogAddTeamMember v-model:open="isDialogOpen" @success="onSuccess" :user="user" />
     </header>
@@ -8,7 +7,7 @@
         <div class="flex gap-2 items-center my-2">
            <!-- <SelectUser v-bind:selectedUsers="selectedUsers" v-bind:users="users" /> -->
         </div>
-        <DataTable :headers="headers" :rows="rows" :rowActions="rowActions" :meta="meta" :hoverColumn="false"/>
+        <DataTable :headers="headers" :rows="rows" :rowActions="rowActions" :meta="meta" :hoverColumn="false" @pageChange="onPageChange"/>
     </main>
 </template>
 <script>
@@ -77,12 +76,21 @@ export default{
         deleteTeamMember,
         onSuccess,
         addTeamMember,
-        editTeamMember
+        editTeamMember,
+        onPageChange
     },
     mounted(){
         this.getTeamMembers()
     }
 }
+
+function onPageChange(page=1) {
+    const filter = {
+        page: page,
+        search: this.search
+    }
+    console.log(filter)
+    this.getTeamMembers(filter)}
 
 function addTeamMember() {
     this.user = {
@@ -105,20 +113,26 @@ function toggleDialog() {
     this.isDialogOpen = !this.isDialogOpen
 }
 
-async function getTeamMembers() {
+async function getTeamMembers(filter={}) {
     const api = useApi();
-    const response = await api.get('/user/get-all')
+    const response = await api.get('/user/get-all', filter)
     console.log(response)
     this.rows = response.users
     this.meta = response.meta
 }
 
 async function deleteTeamMember(id) {
-    const api = useApi();
-    const response = await api._delete(`/user/delete/${id}`)
-    console.log(response)
-    toast.success('Team member deleted')
-    this.getTeamMembers()
+    try{
+        const api = useApi();
+        const response = await api._delete(`/user/delete/${id}`)
+        console.log(response)
+        toast.success('Team member deleted')
+        this.getTeamMembers()
+    } catch (error) {
+        console.log(error.message)
+        toast.error('Error deleting team member')
+    }
+
 }
 
 function onSuccess() {
