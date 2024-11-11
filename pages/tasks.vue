@@ -62,7 +62,7 @@
             </div>
             <SelectDate v-bind:value="date" />
             <SelectUser :availableUsers="users" v-bind:selectedUsers="searchSelectedUsers" id="user-search" />
-            <Button variant="outline" @click="clearFilter"><Icon name="lucide:filter-x" size="24" /></Button>
+            <Button variant="outline" @click="clearFilter"><Icon name="lucide:x" size="24" /></Button>
         </div>
         </div>
         <div class="flex gap-2 items-center my-2">
