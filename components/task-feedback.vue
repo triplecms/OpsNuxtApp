@@ -1,42 +1,34 @@
 <template>
-    <div class="flex flex-col h-[140%] w-full px-6 hide-scrollbar overflow-y-auto" >
-        <Stepper orientation="vertical" class="mx-auto flex w-full max-w-md flex-col justify-start gap-10 hide-scrollbar">
-            <StepperItem
-                v-for="(step, index) in feedbacks"
-                :key="step.task_feedback_id"
-                v-slot="{ state }"
-                class="relative flex w-full items-start gap-6"
-                :step="step.task_feedback_id">
-                <StepperSeparator
-                    v-if="index !== feedbacks.length - 1"
-                    class="absolute left-[18px] top-[38px] block h-[105%] w-0.5 shrink-0 rounded-full bg-muted group-data-[state=completed]:bg-primary"
-                />
-
-                <StepperTrigger as-child>
-                    <Button
-                        :variant="active"
-                        size="icon"
-                        class="z-10 rounded-full shrink-0">
-                        <Icon name="lucide:check" class="size-5" 
-                        :class="'ring-ring ring-offset-2 ring-offset-background'"
-                        :disabled="true"/>
-                    </Button>
-                </StepperTrigger>
-
-                <div class="flex flex-col gap-1">
-                    <StepperTitle
-                        :class="[state === 'active' && 'text-primary']"
-                        class="text-sm font-semibold transition lg:text-base">
-                        {{ formatDate(step.task_feedback_date) }}
-                    </StepperTitle>
-                    <StepperDescription
-                        :class="[state === 'active' && 'text-primary']"
-                        class="sr-only text-xs text-muted-foreground transition md:not-sr-only lg:text-sm">
-                        {{ step.task_feedback_feedback }}
-                    </StepperDescription>
+    <div class="flex flex-col h-[140%] w-full px-6 hide-scrollbar overflow-y-auto gap-4" >
+        <div v-for="feedback in feedbacks" :key="feedback.task_feedback_id" class="flex flex-row w-full gap-2 justify-between">
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger>
+                        <Avatar>
+                            <AvatarImage src=""/>
+                            <AvatarFallback>{{ feedback.user_first_name[0]}}{{ feedback.user_last_name[0] }}</AvatarFallback>
+                        </Avatar>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        {{ feedback.user_first_name }} {{ feedback.user_last_name }}
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
+            <Card class="p-0 border-none shadow-none">
+                <CardHeader class="p-0">
+                    <div class="flex flex-row justify-between text-sm font-semibold items-center">
+                        <p>{{ formatDate(feedback.task_feedback_date) }}</p>
+                    </div>
+                </CardHeader>
+                <div class="flex flex-col justify-between">
+                <p class="text-sm">{{ feedback.task_feedback_feedback }}</p>
                 </div>
-            </StepperItem>
-        </Stepper>
+            </Card> 
+            <Button variant="ghost" size="icon" class="p-0" @click="deleteFeedback(feedback)">
+                <Icon name="lucide:trash" class="w-4 h-4" />
+            </Button>
+        </div>
+
     </div>
 </template>
 <script>
@@ -82,6 +74,10 @@ export default {
                 minute: 'numeric',
                 hour12: true
             })
+        },
+        deleteFeedback(feedback) {
+            console.log(feedback)
+            this.$emit('deleteFeedback', feedback)
         }
     }   
 }

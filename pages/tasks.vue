@@ -5,8 +5,8 @@
         <div class="flex gap-2 items-center">
             <!--<Button><Icon name="lucide:list" /></Button>
             <Button><Icon name="lucide:calendar-days" /></Button>-->
-            <AppSheet v-model:open="isSheetOpen" @update="toggleSheet" class="flex flex-col h-full w-full">
-                <SheetHeader class="flex flex-col h-[25vh] w-full">
+            <AppSheet v-model:open="isSheetOpen" @update="toggleSheet" class="flex flex-col h-full w-full overflow-y-auto">
+                <SheetHeader class="flex flex-col w-full mb-4">
                     <SheetTitle class="flex flex-col items-center gap-2">
                         <div class="flex items-center gap-2">
                             <Button variant="outline" @click="taskFeedback(selectedTask)">
@@ -46,8 +46,8 @@
                         {{ selectedTask.task_description }}
                     </SheetDescription>
                 </SheetHeader>
-                <div class="flex-1 h-[75vh] overflow-y-auto hide-scrollbar">
-                    <TaskFeedback :feedbacks="feedbacks" />
+                <div class="flex-1 overflow-y-auto hide-scrollbar">
+                    <TaskFeedback :feedbacks="feedbacks" @deleteFeedback="deleteFeedback" />
                 </div>
                 <SheetFooter>
                 </SheetFooter>
@@ -190,7 +190,8 @@ export default {
         toggleDialog,
         toggleFeedbackDialog,
         getTaskFeedback,
-        onFeedbackSuccess
+        onFeedbackSuccess,
+        deleteFeedback
     },
     mounted(){
         this.getUsers({
@@ -267,7 +268,6 @@ function editTask(row) {
 }
 
 function taskFeedback() {
-    return;
     //console.log('taskFeedback')
     this.feedback = {
         feedback: ''
@@ -342,6 +342,20 @@ async function deleteTask(task) {
         this.getTasks()
     } catch (error) {
         toast.error('Error deleting task')
+    }
+}
+
+async function deleteFeedback(feedback) {
+    const feedback_uuid = feedback.task_feedback_uuid;
+    console.log(feedback_uuid)
+    try{
+        const api = useApi()
+        const response = await api._delete(`/task/delete-feedback/${feedback_uuid}`)
+        console.log(response)
+        toast.success('Feedback deleted successfully')
+        this.getTaskFeedback(this.selectedTask)
+    } catch (error) {
+        toast.error('Error deleting feedback')
     }
 }
 
