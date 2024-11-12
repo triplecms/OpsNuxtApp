@@ -18,7 +18,7 @@
         }
     }
    function handleSheetUpdate(open){
-    console.log('handleSheetUpdate')
+    //console.log('handleSheetUpdate')
     this.$emit('update:open', open);
    }
   </script>

@@ -42,7 +42,7 @@ export default {
 }
 async function save() {
     try{
-        console.log('Save');
+        //console.log('Save');
         const api = useApi();
         const response = await api.post('/user/create', {
             user_first_name: this.user.user_first_name,
@@ -53,8 +53,7 @@ async function save() {
         toast.success('Team member created')
         this.$emit('success');
     } catch (error) {
-        console.log('Error');
-        console.log(error);
+        //console.log('Error');
         toast.error('Error creating team member')
     }
 
@@ -62,7 +61,7 @@ async function save() {
 async function update() {
     try{
 
-    console.log('Update', this.user);
+    //console.log('Update', this.user);
     const api = useApi();
     const response = await api.put(`/user/update/${this.user.user_id}`, {
         user_first_name: this.user.user_first_name,
@@ -72,8 +71,8 @@ async function update() {
         toast.success('Team member updated')
         this.$emit('success');
     } catch (error) {
-        console.log('Error');
-        console.log(error);
+        //console.log('Error');
+        //console.log(error);
         toast.error('Error updating team member')
     }
 }

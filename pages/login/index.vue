@@ -48,7 +48,7 @@ export default {
 }
 async function validate() {
     try{
-        console.log('Login clicked');
+        //console.log('Login clicked');
         const api = useApi();
         const response = await api.post('/user/initiate-otp', {
             phone: this.phoneNumber
@@ -57,8 +57,8 @@ async function validate() {
             this.validateOtp = true;
         }
     } catch (error) {
-        console.log('Error');
-        console.log(error);
+        //console.log('Error');
+        //console.log(error);
         toast.error('Failed to initiate OTP', 'Please try again later')
 
     }
@@ -66,22 +66,22 @@ async function validate() {
 
 async function handleComplete() {
     try{
-        console.log('Login clicked');
+        //console.log('Login clicked');
         const api = useApi();
         const response = await api.post('/user/verify-otp', {
             phone: this.phoneNumber,
             otp: this.otpValue
         });
         if (response) {
-            console.log('OTP verified');
-            console.log(response);
+            //console.log('OTP verified');
+            //console.log(response);
             const tokenCookie = useCookie('token')
             tokenCookie.value = response.token
             navigateTo('/');
         }
     } catch (error) {
-        console.log('Error');
-        console.log(error);
+        //console.log('Error');
+        //console.log(error);
         toast.error('Failed to initiate OTP', 'Please try again later')
     }
 

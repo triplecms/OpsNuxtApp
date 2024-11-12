@@ -16,7 +16,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
     }
 
     const userRole = getUserRole()
-    console.log('User role:', userRole)
+    //console.log('User role:', userRole)
     
     // Public routes that don't require authentication
     const publicRoutes = ['/login']
@@ -37,7 +37,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
     }
 
     if(userRole && adminRoutes.includes(to.path) && userRole !== 'admin'){
-      console.log(userRole)
+      //console.log(userRole)
       return navigateTo('/unauthorized')
     }
 })

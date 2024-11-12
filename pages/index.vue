@@ -8,7 +8,7 @@ definePageMeta({
     middleware: ['auth']
 })
 onMounted(() => {
-    console.log('mounted')
+    //console.log('mounted')
     navigateTo('/tasks')
 })
 </script>

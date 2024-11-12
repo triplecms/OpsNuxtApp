@@ -155,7 +155,7 @@ export default {
                             return 'complete'
                         }
                         const today = new Date()
-                        console.log(row.task_end_date, today)
+                        //console.log(row.task_end_date, today)
                         if(row.task_end_date && new Date(row.task_end_date) < today) {
                             return 'overdue'
                         }
@@ -201,14 +201,14 @@ export default {
 }
 
 function rowClick(row) {
-    console.log('rowClick')
-    console.log(row)
+    //console.log('rowClick')
+    //console.log(row)
     this.selectedTask = row;
     this.toggleSheet();
 }
 
 function toggleSheet() {
-    console.log('toggleSheet')
+    //console.log('toggleSheet')
     this.isSheetOpen = !this.isSheetOpen;
     if(this.isSheetOpen) {
         this.getTaskFeedback(this.selectedTask)
@@ -240,7 +240,7 @@ function addTask() {
             end: null
         }
     }
-    console.log('addTask', this.task)
+    //console.log('addTask', this.task)
     this.toggleDialog()
 }
 
@@ -262,13 +262,13 @@ function editTask(row) {
             end: row.task_end_date
         }
     }
-    console.log('editTask', this.task)
+    //console.log('editTask', this.task)
     this.toggleDialog()
 }
 
 function taskFeedback() {
     return;
-    console.log('taskFeedback')
+    //console.log('taskFeedback')
     this.feedback = {
         feedback: ''
     }
@@ -276,15 +276,15 @@ function taskFeedback() {
 }
 
 async function getTaskFeedback(task) {
-    console.log('getFeedback', task.task_id)
+    //console.log('getFeedback', task.task_id)
     const api = useApi()
     const response = await api.get(`/task/get-feedback/${task.task_id}`)
-    console.log(response)
+    //console.log(response)
     this.feedbacks = response.taskFeedback
 }
 
 function taskAttachment(row) {
-    console.log('taskAttachment', row)
+    //console.log('taskAttachment', row)
 }
 
 function onPageChange(page = 1) {
@@ -295,14 +295,14 @@ function onPageChange(page = 1) {
         users: this.searchSelectedUsers,
         search: this.search
     }
-    console.log(filter)
+    //console.log(filter)
     this.getTasks(filter)
 }
 
 async function getUsers(params = {}) {
     const api = useApi();
     const response = await api.get('/user/get-all', params)
-    console.log(response)
+    //console.log(response)
     this.users = response.users
     this.meta = response.meta
     this.task.users = response.users
@@ -317,7 +317,7 @@ function onSuccess() {
 
 function onFeedbackSuccess() {
     //this.getTasks()
-    console.log('onFeedbackSuccess')
+    //console.log('onFeedbackSuccess')
     this.toggleFeedbackDialog()
     this.getTaskFeedback(this.selectedTask)
     //this.toggleSheet()
@@ -326,17 +326,17 @@ function onFeedbackSuccess() {
 async function getTasks(filter = null) {
     const api = useApi();
     const response = await api.get('/task/get-all', filter)
-    console.log(response)
+    //console.log(response)
     this.rows = response.tasks
     this.meta = response.meta
 }
 
 async function deleteTask(task) {
     try{
-        console.log(task)
+        //console.log(task)
         const api = useApi();
         const response = await api._delete(`/task/delete/${task.task_uuid}`)
-        console.log(response)
+        //console.log(response)
         toast.success('Task deleted successfully')
         this.toggleSheet();
         this.getTasks()

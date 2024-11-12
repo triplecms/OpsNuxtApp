@@ -42,7 +42,7 @@ export default {
 }
 
 function filterUsers(users, selectedUsers) {
-    console.log(users, selectedUsers);
+    //console.log(users, selectedUsers);
     return users.filter(user => !selectedUsers.some(selected => selected.user_id === user.user_id));
 }
 </script>

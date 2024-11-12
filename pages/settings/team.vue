@@ -54,7 +54,7 @@ export default{
                     id: 1,
                     name: 'Edit',
                     action: (row) => {
-                        console.log(row)
+                        //console.log(row)
                         this.editTeamMember(row)
                     },
                     icon: 'lucide:pencil'
@@ -89,7 +89,7 @@ function onPageChange(page=1) {
         page: page,
         search: this.search
     }
-    console.log(filter)
+    //console.log(filter)
     this.getTeamMembers(filter)}
 
 function addTeamMember() {
@@ -104,8 +104,8 @@ function addTeamMember() {
 
 function editTeamMember(row) {
     this.user = row
-    console.log(row)
-    console.log(this.user)
+    //console.log(row)
+    //console.log(this.user)
     this.toggleDialog()
 }
 
@@ -116,7 +116,7 @@ function toggleDialog() {
 async function getTeamMembers(filter={}) {
     const api = useApi();
     const response = await api.get('/user/get-all', filter)
-    console.log(response)
+    //console.log(response)
     this.rows = response.users
     this.meta = response.meta
 }
@@ -125,11 +125,11 @@ async function deleteTeamMember(id) {
     try{
         const api = useApi();
         const response = await api._delete(`/user/delete/${id}`)
-        console.log(response)
+        //console.log(response)
         toast.success('Team member deleted')
         this.getTeamMembers()
     } catch (error) {
-        console.log(error.message)
+        //console.log(error.message)
         toast.error('Error deleting team member')
     }
 
