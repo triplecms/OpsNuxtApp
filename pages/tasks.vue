@@ -5,8 +5,8 @@
         <div class="flex gap-2 items-center">
             <!--<Button><Icon name="lucide:list" /></Button>
             <Button><Icon name="lucide:calendar-days" /></Button>-->
-            <AppSheet v-model:open="isSheetOpen" @update="toggleSheet">
-                <SheetHeader>
+            <AppSheet v-model:open="isSheetOpen" @update="toggleSheet" class="flex flex-col h-full w-full">
+                <SheetHeader class="flex flex-col h-[25vh] w-full">
                     <SheetTitle class="flex flex-col items-center gap-2">
                         <div class="flex items-center gap-2">
                             <Button variant="outline" @click="taskFeedback(selectedTask)">
@@ -45,13 +45,15 @@
                     <SheetDescription>
                         {{ selectedTask.task_description }}
                     </SheetDescription>
-                    </SheetHeader>
-                    <div class="grid gap-4 py-4">
-                    </div>
-                    <SheetFooter>
-                    </SheetFooter>
+                </SheetHeader>
+                <div class="flex-1 h-[75vh] overflow-y-auto hide-scrollbar">
+                    <TaskFeedback :feedbacks="feedbacks" />
+                </div>
+                <SheetFooter>
+                </SheetFooter>
             </AppSheet>
             <DialogAddTask v-model:open="isDialogOpen" @success="onSuccess" :task="task"/>
+            <DialogAddTaskFeedback v-model:open="isFeedbackDialogOpen" @success="onFeedbackSuccess" :feedback="feedback" :task="selectedTask"/>
         </div>
     </header>
     <div>
@@ -90,13 +92,15 @@ export default {
     name: 'TasksPage',
     data() {
         return {
+            isSheetOpen: false,
+            isDialogOpen: false,
+            isFeedbackDialogOpen: false,
             searchUsers: [],
             searchSelectedUsers: [],
             date: {
                 start: null,
                 end: null
             },
-            isSheetOpen: false,
             task: {
                 task_id: null,
                 task_name: '',
@@ -111,10 +115,10 @@ export default {
                     start: null,
                     end: null
                 },
+                feedback: []
             },
             tasks: [],
             search: '',
-            isDialogOpen: false,
             open: false,
             meta: null,
             headers: [
@@ -163,6 +167,10 @@ export default {
                 }
             ],
             rows: [],
+            feedback: {
+                feedback: ''
+            },
+            feedbacks: []
         }
     },
     methods: {
@@ -178,10 +186,16 @@ export default {
         toggleSheet,
         clearFilter,
         taskFeedback,
-        taskAttachment
+        taskAttachment,
+        toggleDialog,
+        toggleFeedbackDialog,
+        getTaskFeedback,
+        onFeedbackSuccess
     },
     mounted(){
-        this.getUsers()
+        this.getUsers({
+            limit : 9999
+        })
         this.getTasks()
     }
 }
@@ -196,6 +210,17 @@ function rowClick(row) {
 function toggleSheet() {
     console.log('toggleSheet')
     this.isSheetOpen = !this.isSheetOpen;
+    if(this.isSheetOpen) {
+        this.getTaskFeedback(this.selectedTask)
+    }
+}
+
+function toggleDialog() {
+    this.isDialogOpen = !this.isDialogOpen
+}
+
+function toggleFeedbackDialog() {
+    this.isFeedbackDialogOpen = !this.isFeedbackDialogOpen
 }
 
 function addTask() {
@@ -241,16 +266,25 @@ function editTask(row) {
     this.toggleDialog()
 }
 
-function taskFeedback(row) {
-    console.log('taskFeedback', row)
+function taskFeedback() {
+    return;
+    console.log('taskFeedback')
+    this.feedback = {
+        feedback: ''
+    }
+    this.toggleFeedbackDialog()
+}
+
+async function getTaskFeedback(task) {
+    console.log('getFeedback', task.task_id)
+    const api = useApi()
+    const response = await api.get(`/task/get-feedback/${task.task_id}`)
+    console.log(response)
+    this.feedbacks = response.taskFeedback
 }
 
 function taskAttachment(row) {
     console.log('taskAttachment', row)
-}
-
-function toggleDialog() {
-    this.isDialogOpen = !this.isDialogOpen
 }
 
 function onPageChange(page = 1) {
@@ -279,6 +313,14 @@ function onSuccess() {
     this.getTasks()
     this.toggleDialog()
     this.toggleSheet()
+}
+
+function onFeedbackSuccess() {
+    //this.getTasks()
+    console.log('onFeedbackSuccess')
+    this.toggleFeedbackDialog()
+    this.getTaskFeedback(this.selectedTask)
+    //this.toggleSheet()
 }
 
 async function getTasks(filter = null) {
