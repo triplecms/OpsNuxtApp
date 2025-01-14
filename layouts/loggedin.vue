@@ -3,7 +3,7 @@
     <SidebarProvider :default-open="true">
       <AppSidebar />
       <main class="py-4 pl-4">
-        <SidebarTrigger class="mt-1"/>
+        <SidebarTrigger class="mt-3"/>
       </main>
       <main class="p-4 w-full">
         <slot />

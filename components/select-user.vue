@@ -1,7 +1,7 @@
 <template>
     <Popover v-model:open="open">
         <PopoverTrigger as-child>
-            <Button variant="outline" role="combobox" :aria-expanded="open" class="flex items-center justify-start"><Icon name="lucide:circle-user" class="mr-2 h-4 w-4" />Select User</Button>
+            <Button variant="outline" role="combobox" :aria-expanded="open" class="flex items-center justify-center"><Icon name="lucide:circle-user" class="mr-2 h-4 w-4" />Select User</Button>
         </PopoverTrigger>
         <PopoverContent class="w-[200px] p-0">
             <Command>
@@ -43,6 +43,8 @@ export default {
 
 function filterUsers(users, selectedUsers) {
     //console.log(users, selectedUsers);
-    return users.filter(user => !selectedUsers.some(selected => selected.user_id === user.user_id));
+    const filteredUsers = users.filter(user => !selectedUsers.some(selected => selected.user_id === user.user_id));
+    this.$emit('update', filteredUsers)
+    return filteredUsers
 }
 </script>

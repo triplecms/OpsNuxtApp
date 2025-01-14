@@ -93,7 +93,7 @@
                                     Previous
                                 </Button>
                                 <div class="flex items-center space-x-1">
-                                    <span v-for="page in Number(meta.pages)" :key="page">
+                                    <!-- <span v-for="page in Number(meta.pages)" :key="page">
                                         <Button 
                                             :variant="page === Number(meta.page) ? 'default' : 'outline'"
                                             size="sm"
@@ -101,7 +101,7 @@
                                         >
                                             {{ page }}
                                         </Button>
-                                    </span>
+                                    </span> -->
                                 </div>
                                 <Button 
                                     variant="outline" 

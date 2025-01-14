@@ -13,7 +13,7 @@
         </Button>
         </PopoverTrigger>
         <PopoverContent class="w-auto p-0">
-            <RangeCalendar v-bind="value" initial-focus :number-of-months="1" @update:model-value="(newValue) => { value.start = newValue.start; value.end = newValue.end }" />
+            <RangeCalendar v-bind="value" initial-focus :number-of-months="1" @update:model-value="onDateChange" />
         </PopoverContent>
     </Popover>
 </template>
@@ -26,5 +26,12 @@ export default {
             required: true
         }
     },
+    methods: {
+        onDateChange(date) {
+            this.value.start = date.start
+            this.value.end = date.end
+            this.$emit('update', this.value)
+        }
+    }
 }
 </script>

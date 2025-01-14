@@ -3,85 +3,60 @@
         <div class="flex gap-2 items-center">
         </div>
         <div class="flex gap-2 items-center">
-            <!--<Button><Icon name="lucide:list" /></Button>
-            <Button><Icon name="lucide:calendar-days" /></Button>-->
-            <AppSheet v-model:open="isSheetOpen" @update="toggleSheet" class="flex flex-col h-full w-full overflow-y-auto">
-                <SheetHeader class="flex flex-col w-full mb-4">
-                    <SheetTitle class="flex flex-col items-center gap-2">
-                        <div class="flex items-center gap-2">
-                            <Button variant="outline" @click="taskFeedback(selectedTask)">
-                                <Icon name="lucide:messages-square" class="w-4 h-4 flex items-center justify-center" />
-                            </Button>
-                            <Button variant="outline" @click="taskAttachment(selectedTask)">
-                                <Icon name="lucide:paperclip" class="w-4 h-4 flex items-center justify-center" />
-                            </Button>
-                            <Button variant="outline" @click="editTask(selectedTask)">
-                                <Icon name="lucide:pencil" class="w-4 h-4 flex items-center justify-center" />
-                            </Button>   
-                            <Button variant="destructive" @click="deleteTask(selectedTask)">
-                                <Icon name="lucide:trash" class="w-4 h-4 flex items-center justify-center" />
-                            </Button>
-                        </div>
-                        <div class="flex flex-col items-start w-full gap-2">
-                            <span class="text-sm text-gray-500 ml-1">TRIP{{ selectedTask.task_id }}</span>
-                            <h2 class="text-sm"> 
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <Avatar>
-                                            <AvatarImage :src="selectedTask.task_created_by_user.avatar_url" :alt="`${selectedTask.task_created_by_user.user_first_name} ${selectedTask.task_created_by_user.user_last_name}`" />
-                                            <AvatarFallback>{{ selectedTask.task_created_by_user.user_first_name[0]}}{{ selectedTask.task_created_by_user.user_last_name[0] }}</AvatarFallback>
-                                        </Avatar>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        {{ selectedTask.task_created_by_user.user_first_name }} {{ selectedTask.task_created_by_user.user_last_name }}
-                                    </TooltipContent>
-                                </Tooltip>
-                                </TooltipProvider>
-                                {{ selectedTask.task_name }}
-                            </h2>
-                        </div>
-                    </SheetTitle>
-                    <SheetDescription>
-                        {{ selectedTask.task_description }}
-                    </SheetDescription>
-                </SheetHeader>
-                <div class="flex-1 overflow-y-auto hide-scrollbar">
-                    <TaskFeedback :feedbacks="feedbacks" @deleteFeedback="deleteFeedback" />
+            <AppSheet v-model:open="isSheetOpen" @update="toggleSheet" class="flex flex-col h-[100vh] w-full overflow-y">
+                <div class="flex flex-col h-[100%] w-full overflow-y-auto hide-scrollbar p-2 gap-4">
+                    <FormTask :task="selectedTask" @task-updated="onTaskUpdated"/>
+                    <FormFeedback :task="selectedTask"/>
+                    <FormAttachment :task="selectedTask"/>
+                    <div>
+                        <Button variant="destructive" @click="deleteTask(selectedTask)">Delete</Button>
+                    </div>
                 </div>
-                <SheetFooter>
-                </SheetFooter>
             </AppSheet>
             <DialogAddTask v-model:open="isDialogOpen" @success="onSuccess" :task="task"/>
             <DialogAddTaskFeedback v-model:open="isFeedbackDialogOpen" @success="onFeedbackSuccess" :feedback="feedback" :task="selectedTask"/>
         </div>
     </header>
     <div>
-        
         <div class="flex gap-2 items-center my-2 justify-between">
-        <Button variant="" @click="addTask"><Icon name="lucide:plus" size="24" /> Task</Button>
-        <div class="flex gap-2 items-center">
-            <div class="flex items-center gap-0.5">
-                <Input v-model="search" placeholder="Search" />
-                <Button variant="outline" class="flex items-center gap-1" @click="onPageChange(1)"><Icon name="lucide:search"/>Search</Button>
+            <div class="flex items-center gap-2">
+                <Input v-model="search" placeholder="Search" @change="searchTasks" class="w-64"/>
+                <Popover>
+                    <PopoverTrigger>
+                        <Button variant="outline" class="flex items-center gap-1"><Icon name="lucide:filter"/>Filter</Button>
+                    </PopoverTrigger>
+                    <PopoverContent>
+                        <div class="flex flex-col gap-2">
+                            <SelectDate v-bind:value="date" @update="onDateChange"/>
+                            <SelectUser :availableUsers="users" v-bind:selectedUsers="searchSelectedUsers" id="user-search" @update="onUserChange"/>
+                            <div class="flex flex-col gap-2 justify-start">
+                                <div v-for="(user, index) in searchSelectedUsers" :key="index" class="inline-block bg-gray-200 text-gray-700 rounded-full px-3 py-1 text-sm font-semibold flex justify-between items-center">
+                                    {{ user.user_first_name }} {{ user.user_last_name }}
+                                    <button @click="removeSelectedUser(index)" class="ml-2 text-sm text-gray-700 hover:text-red-500"><Icon name="lucide:x" class="w-4 h-4 flex items-center justify-center" /></button>
+                                </div>
+                            </div>
+                            <!--<Button @click="onPageChange(1)">Apply</Button>-->
+                            <Button @click="clearFilter">Reset</Button>
+                        </div>
+                    </PopoverContent>
+                </Popover>
+                <!--<Button variant="outline" class="flex items-center gap-1" @click="onPageChange(1)"><Icon name="lucide:search"/>Search</Button>-->
             </div>
+        <Button variant="" @click="addTask">New Task</Button>
+        <!--<div class="flex gap-2 items-center">
             <SelectDate v-bind:value="date" />
             <SelectUser :availableUsers="users" v-bind:selectedUsers="searchSelectedUsers" id="user-search" />
             <Button variant="outline" @click="clearFilter"><Icon name="lucide:x" size="24" /></Button>
+        </div>-->
         </div>
-        </div>
-        <div class="flex gap-2 items-center my-2">
-            <div v-for="(user, index) in searchSelectedUsers" :key="index" class="inline-block bg-gray-200 text-gray-700 rounded-full px-3 py-1 text-sm font-semibold flex items-center">
-                {{ user.user_first_name }} {{ user.user_last_name }}
-                <button @click="() => { searchSelectedUsers.splice(index, 1)}" class="ml-2 text-sm text-gray-700 hover:text-red-500"><Icon name="lucide:x" class="w-4 h-4 flex items-center justify-center" /></button>
-            </div>
-        </div>
+        
     </div>
     <main class="flex flex-col gap-4">
         <DataTable :headers="headers" :rows="rows" :meta="meta" @pageChange="onPageChange" @rowClick="rowClick"/>
     </main>
 </template>
 <script>
+import { debounce } from 'lodash'
 
 definePageMeta({
     layout: 'loggedin',
@@ -191,7 +166,12 @@ export default {
         toggleFeedbackDialog,
         getTaskFeedback,
         onFeedbackSuccess,
-        deleteFeedback
+        deleteFeedback,
+        searchTasks,
+        onDateChange,
+        onUserChange,
+        removeSelectedUser,
+        onTaskUpdated
     },
     mounted(){
         this.getUsers({
@@ -199,6 +179,29 @@ export default {
         })
         this.getTasks()
     }
+}
+
+function onTaskUpdated(response) {
+    console.log(response)
+    this.getTasks()
+}
+
+function removeSelectedUser(index) {
+    this.searchSelectedUsers.splice(index, 1)
+    this.onPageChange(1)
+}
+
+function onUserChange(users) {
+    console.log(users)
+    this.onPageChange(1)
+}
+
+function onDateChange(date) {
+    this.onPageChange(1)
+}
+
+function searchTasks() {
+    debounce(() => this.onPageChange(1), 1000)()
 }
 
 function rowClick(row) {
@@ -213,6 +216,8 @@ function toggleSheet() {
     this.isSheetOpen = !this.isSheetOpen;
     if(this.isSheetOpen) {
         this.getTaskFeedback(this.selectedTask)
+    }else{
+        this.getTasks()
     }
 }
 
@@ -326,7 +331,7 @@ function onFeedbackSuccess() {
 async function getTasks(filter = null) {
     const api = useApi();
     const response = await api.get('/task/get-all', filter)
-    //console.log(response)
+    console.log(response)
     this.rows = response.tasks
     this.meta = response.meta
 }
