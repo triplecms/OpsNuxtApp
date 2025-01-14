@@ -56,8 +56,7 @@
     </main>
 </template>
 <script>
-import { debounce } from 'lodash'
-
+import _ from 'lodash'
 definePageMeta({
     layout: 'loggedin',
     middleware: ['auth']
@@ -201,7 +200,7 @@ function onDateChange(date) {
 }
 
 function searchTasks() {
-    debounce(() => this.onPageChange(1), 1000)()
+    _.debounce(() => this.onPageChange(1), 1000)()
 }
 
 function rowClick(row) {
