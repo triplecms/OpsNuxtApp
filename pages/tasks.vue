@@ -316,7 +316,7 @@ async function getUsers(params = {}) {
 function onSuccess() {
     this.getTasks()
     this.toggleDialog()
-    this.toggleSheet()
+    //this.toggleSheet()
 }
 
 function onFeedbackSuccess() {
