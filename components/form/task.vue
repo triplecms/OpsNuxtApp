@@ -72,7 +72,9 @@ export default {
             },
             users: [],
             searchSelectedUsers: [],
-            selectedUsers: this.task.assignedUsers
+            selectedUsers: this.task.assignedUsers,
+            isDiscussed: ref(this.task.task_is_discussed),
+            isComplete: ref(this.task.task_is_complete)
         }
     },
     mounted(){

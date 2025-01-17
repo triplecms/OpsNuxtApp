@@ -17,8 +17,18 @@ export const useApi = () => {
   const post = async <T>(endpoint: string, payload: any) => {
     try {
       const token = useCookie('token')  // Add this line
-      //console.log('Request URL:', `${baseUrl}${endpoint}`)
-      //console.log('Request Payload:', payload)
+      console.log('Request URL:', `${baseUrl}${endpoint}`)
+      console.log('Request Payload:', payload)
+
+      if(payload instanceof FormData){
+        return await $fetch<T>(`${baseUrl}${endpoint}`, {
+          method: 'POST',
+          body: payload,
+          headers: {
+            'Authorization': `Bearer ${token.value}`,
+          }
+        })
+      }
 
       return await $fetch<T>(`${baseUrl}${endpoint}`, {
         method: 'POST',

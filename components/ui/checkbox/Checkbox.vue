@@ -26,7 +26,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
   >
     <CheckboxIndicator class="flex h-full w-full items-center justify-center text-current">
       <slot>
-        <Icon name="lucide:check" />
+        <CheckIcon class="h-4 w-4" />
       </slot>
     </CheckboxIndicator>
   </CheckboxRoot>
