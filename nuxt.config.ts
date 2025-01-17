@@ -9,7 +9,8 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     'shadcn-nuxt',
     '@nuxt/icon',
-    'nuxt-tiptap-editor'
+    'nuxt-tiptap-editor',
+    'nuxt-lucide-icons',
   ],
   shadcn: {
     /**

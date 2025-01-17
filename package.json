@@ -19,6 +19,7 @@
     "lucide-nuxt": "^1.2.2",
     "lucide-vue-next": "^0.454.0",
     "nuxt": "^3.13.2",
+    "nuxt-lucide-icons": "^1.0.5",
     "nuxt-tiptap-editor": "^2.0.0",
     "radix-vue": "^1.9.8",
     "shadcn-nuxt": "^0.10.4",
